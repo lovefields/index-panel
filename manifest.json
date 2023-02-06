@@ -1,0 +1,12 @@
+{
+  "name": "Index panel",
+  "id": "1204564715925096637",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": [
+    "figma",
+    "figjam"
+  ],
+  "containsWidget": true,
+  "widgetApi": "1.0.0"
+}
