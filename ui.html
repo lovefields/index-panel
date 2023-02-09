@@ -1,0 +1,346 @@
+<div class="setting-box">
+    <div class="row">
+        <div class="text-area">
+            <p class="title">Target</p>
+            <p class="caption">Target is all ways top layers.</p>
+        </div>
+
+        <div class="radio-list">
+            <label class="radio">
+                <input class="input input-target" type="radio" name="target" value="frame" checked />
+                <span class="path"></span>
+                <span class="text">Frame</span>
+            </label>
+
+            <label class="radio">
+                <input class="input input-target" type="radio" name="target" value="section" />
+                <span class="path"></span>
+                <span class="text">Section</span>
+            </label>
+
+            <label class="radio">
+                <input class="input input-target" type="radio" name="target" value="frameinsection" />
+                <span class="path"></span>
+                <span class="text">Frame in Section</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="text-area">
+            <p class="title">Rule</p>
+            <p class="caption">If you want set name rule, choose a rule below.</p>
+        </div>
+
+        <div class="radio-list">
+            <label class="radio">
+                <input class="input input-rule" type="radio" name="rule" value="none" checked />
+                <span class="path"></span>
+                <span class="text">None</span>
+            </label>
+
+            <label class="radio">
+                <input class="input input-rule" type="radio" name="rule" value="start" />
+                <span class="path"></span>
+                <span class="text">Name start to</span>
+            </label>
+
+            <label class="radio">
+                <input class="input input-rule" type="radio" name="rule" value="end" />
+                <span class="path"></span>
+                <span class="text">Name end to</span>
+            </label>
+
+            <label class="radio">
+                <input class="input input-rule" type="radio" name="rule" value="reg" />
+                <span class="path"></span>
+                <span class="text">Regular expression</span>
+            </label>
+        </div>
+
+        <div class="reg-area">
+            <p class="caption">Enter the name you want to set as a rule below.</p>
+            <input type="text" class="input input-reg" placeholder="ex) Page" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="text-area">
+            <p class="title">Other link <span class="option">(Optional)</span></p>
+            <p class="caption">If you want set any link for each row.</p>
+        </div>
+
+        <div class="content-area">
+            <label class="checkbox">
+                <input type="checkbox" class="input input-other" />
+                <svg viewBox="0 0 14 14" class="icon">
+                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                    <path
+                        class="line"
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"
+                    ></path>
+                </svg>
+                <span class="text">Yes, I use</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="btn-area">
+        <button class="btn btn-cancel">CANCEL</button>
+        <button class="btn btn-save">SAVE</button>
+    </div>
+</div>
+
+<script>
+    const $cancel = document.querySelector(".btn-cancel");
+    const $save = document.querySelector(".btn-save");
+
+    $cancel.addEventListener("click", () => {
+        parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+    });
+
+    $save.addEventListener("click", () => {
+        const target = document.querySelector(".input-target:checked").value;
+        const rule = document.querySelector(".input-rule:checked").value;
+        const reg = document.querySelector(".input-reg").value;
+        const other = document.querySelector(".input-other").checked;
+        let settingData = {
+            target: target,
+            rule: rule,
+            reg: reg,
+            other: other,
+        };
+
+        if (settingData.rule !== "none" && settingData.reg === "") {
+            document.querySelector(".reg-area").classList.add("--error");
+        } else {
+            parent.postMessage({ pluginMessage: { type: "setting", data: settingData } }, "*");
+        }
+    });
+
+    window.onmessage = (event) => {
+        if (event.data.pluginMessage !== "") {
+            let settingData = JSON.parse(event.data.pluginMessage);
+
+            document.querySelectorAll(".input-target").forEach((item) => {
+                let value = item.value;
+
+                item.checekd = false;
+                if (value === settingData.target) {
+                    item.checked = true;
+                }
+            });
+            document.querySelectorAll(".input-rule").forEach((item) => {
+                let value = item.value;
+
+                item.checekd = false;
+                if (value === settingData.rule) {
+                    item.checked = true;
+                }
+            });
+            document.querySelector(".input-reg").value = settingData.reg;
+            document.querySelector(".input-other").checked = settingData.other;
+        }
+    };
+</script>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Gothic A1", sans-serif;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    button {
+        font-family: "Gothic A1", sans-serif;
+    }
+
+    .setting-box {
+        display: flex;
+        flex-direction: column;
+        row-gap: 30px;
+        padding: 20px;
+    }
+
+    .row,
+    .radio-list {
+        display: flex;
+        flex-direction: column;
+        row-gap: 10px;
+    }
+
+    .row .text-area {
+        line-height: 1.5;
+    }
+
+    .row .text-area .title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .row .text-area .title .option {
+        color: #6436ea;
+        font-size: 14px;
+        font-weight: normal;
+    }
+
+    .row .text-area .caption {
+        color: #949494;
+        font-size: 14px;
+    }
+
+    .radio {
+        display: flex;
+        column-gap: 6px;
+        align-items: center;
+    }
+
+    .radio .input {
+        display: none;
+    }
+
+    .radio .path {
+        display: block;
+        position: relative;
+        width: 14px;
+        height: 14px;
+        border: 1px solid #e0d7fb;
+        border-radius: 50%;
+        box-sizing: border-box;
+    }
+
+    .radio .path::before {
+        display: none;
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        background: #835eee;
+        border-radius: 50%;
+    }
+
+    .radio .text {
+        display: block;
+        height: 29px;
+        padding: 0 8px;
+        background: #f1f1f1;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 29px;
+    }
+
+    .radio .input:checked ~ .path {
+        border-color: #835eee;
+    }
+
+    .radio .input:checked ~ .path::before {
+        display: block;
+    }
+
+    .radio .input:checked ~ .text {
+        background: #6436ea;
+        color: #f0ebfd;
+    }
+
+    .reg-area .caption {
+        color: #949494;
+        font-size: 14px;
+    }
+
+    .reg-area .input {
+        width: 100%;
+        height: 37px;
+        padding: 0 12px;
+        margin-top: 2px;
+        border: 1px solid #d1c3f9;
+        border-radius: 5px;
+        outline: 0;
+    }
+
+    .reg-area.--error .caption {
+        color: #e84e4e;
+    }
+
+    .reg-area.--error .input {
+        background: #fff4f4;
+        border-color: #e84e4e;
+    }
+
+    .checkbox {
+        display: flex;
+        column-gap: 6px;
+        align-items: center;
+    }
+
+    .checkbox .input {
+        display: none;
+    }
+
+    .checkbox .icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .checkbox .icon .bg {
+        fill: none;
+        stroke: #e0d7fb;
+    }
+
+    .checkbox .icon .line {
+        fill: none;
+    }
+
+    .checkbox .text {
+        display: block;
+        color: #616161;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .checkbox .input:checked ~ .icon .bg {
+        fill: #835eee;
+        stroke: #835eee;
+    }
+
+    .checkbox .input:checked ~ .icon .line {
+        fill: #fff;
+    }
+
+    .checkbox .input:checked ~ .text {
+        color: #6436ea;
+    }
+
+    .btn-area {
+        display: flex;
+        column-gap: 10px;
+    }
+
+    .btn-area .btn {
+        flex: 1 0 0;
+        height: 35px;
+        padding: 0;
+        background: #f0ebfd;
+        color: #b29bf5;
+        border: 0;
+        border-radius: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 35px;
+        cursor: pointer;
+    }
+
+    .btn-area .btn-save {
+        background: #6436ea;
+        color: #fff;
+    }
+</style>
