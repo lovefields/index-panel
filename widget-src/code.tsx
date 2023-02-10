@@ -35,6 +35,7 @@ function indexWidget() {
             }
 
             if (propertyName === "refresh") {
+                refresh(settingData);
             }
 
             if (propertyName === "creat") {
@@ -46,13 +47,87 @@ function indexWidget() {
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
                 setSettingData(JSON.stringify(msg.data));
-                refresh();
+                refresh(JSON.stringify(msg.data));
             }
 
-            figma.closePlugin();
+            if (msg.type !== "reg") {
+                figma.closePlugin();
+            } else {
+                figma.notify("You must enter the correct regular expression grammar.", {
+                    error: true,
+                });
+            }
         };
     });
 
+    function refresh(rowData: string) {
+        let data = JSON.parse(rowData);
+        let list: (FrameNode | SectionNode)[] = [];
+        let pageList = figma.root.children;
+        let regexp: RegExp = new RegExp(".*");
+
+        // make RegExp
+        if (data.rule === "start") {
+            regexp = new RegExp(`^${data.reg}`);
+        }
+
+        if (data.rule === "end") {
+            regexp = new RegExp(`${data.reg}$`);
+        }
+
+        if (data.rule === "reg") {
+            regexp = new RegExp(`${data.reg}`);
+        }
+
+        // get list
+        pageList.forEach((page) => {
+            page.children.forEach((child) => {
+                if (data.target === "frame") {
+                    if (child.type === "FRAME") {
+                        list.push(child);
+                    }
+                }
+
+                if (data.target === "section") {
+                    if (child.type === "SECTION") {
+                        list.push(child);
+                    }
+                }
+
+                if (data.target === "frameinsection") {
+                    if (child.type === "SECTION") {
+                        child.children.forEach((progeny) => {
+                            if (progeny.type === "FRAME") {
+                                list.push(progeny);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        let accordList = list.filter((item) => {
+            if (data.rule === "none") {
+                return item;
+            } else {
+                if (regexp.test(item.name) === true) {
+                    return item;
+                }
+            }
+        });
+
+        listDataArrange(accordList);
+    }
+
+    function listDataArrange(list: (FrameNode | SectionNode)[]) {
+        if (indexData === "") {
+            // just add
+        } else {
+            // arrange
+        }
+        console.log(indexData);
+        console.log(list);
+    }
 
     // render return
     if (widgetStatus === "new") {

@@ -113,12 +113,32 @@
             other: other,
         };
 
-        if (settingData.rule !== "none" && settingData.reg === "") {
-            document.querySelector(".reg-area").classList.add("--error");
+        if (settingData.rule !== "none") {
+            if (settingData.reg === "") {
+                document.querySelector(".reg-area").classList.add("--error");
+            } else {
+                let checkRegex = validateRegex(settingData.reg);
+
+                if (checkRegex === true) {
+                    parent.postMessage({ pluginMessage: { type: "setting", data: settingData } }, "*");
+                } else {
+                    document.querySelector(".reg-area").classList.add("--error");
+                    parent.postMessage({ pluginMessage: { type: "reg" } }, "*");
+                }
+            }
         } else {
             parent.postMessage({ pluginMessage: { type: "setting", data: settingData } }, "*");
         }
     });
+
+    function validateRegex(regexString) {
+        try {
+            let regex = new RegExp(regexString);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 
     window.onmessage = (event) => {
         if (event.data.pluginMessage !== "") {
