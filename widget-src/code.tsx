@@ -237,6 +237,8 @@ function indexWidget() {
                             other: "",
                             otherEdit: true,
                         };
+                    }else{
+                        existingData[item.id].name = item.name;
                     }
                 });
 
