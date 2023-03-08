@@ -310,16 +310,16 @@ function indexWidget() {
 
             if (row.status == 1) {
                 statusData = {
-                    bg: "#F4FFF8",
-                    text: "#38c66b",
+                    bg: "#FFF4E8",
+                    text: "#FF9E2C",
                     content: "In progress",
                 };
             }
 
             if (row.status == 2) {
                 statusData = {
-                    bg: "#F5F8FF",
-                    text: "#5176f8",
+                    bg: "#F4FFF8",
+                    text: "#38C66B",
                     content: "Completed",
                 };
             }
