@@ -8,8 +8,9 @@ function indexWidget() {
     const [indexTitle, setIndexTitle] = useSyncedState("indexTitle", "");
     const [indexCaption, setIndexCaption] = useSyncedState("indexCaption", "");
     const [updateData, setUpdateData] = useSyncedState("updateData", "");
+    const [pageName, setPageName] = useSyncedState("pageName", false);
+    const [sectionName, setSectionName] = useSyncedState("sectionName", false);
     let widgetId = useWidgetId();
-
     let structure;
 
     usePropertyMenu(
@@ -33,7 +34,7 @@ function indexWidget() {
         ({ propertyName, propertyValue }) => {
             if (propertyName === "setting") {
                 return new Promise((resolve) => {
-                    figma.showUI(__html__, { width: 420, height: 668 });
+                    figma.showUI(__html__, { width: 420, height: 500 });
                     figma.ui.postMessage(settingData);
                 });
             }
@@ -87,9 +88,13 @@ function indexWidget() {
 
     function refresh(rowData: string) {
         let data = JSON.parse(rowData);
-        let list: (FrameNode | SectionNode)[] = [];
+        let list:any[] = [];
         let pageList = figma.root.children;
         let regexp: RegExp = new RegExp(".*");
+
+
+        setPageName(data.pageName);
+        setSectionName(data.sectionName);
 
         // make RegExp
         if (data.rule === "start") {
@@ -109,13 +114,25 @@ function indexWidget() {
             page.children.forEach((child) => {
                 if (data.target === "frame") {
                     if (child.type === "FRAME") {
-                        list.push(child);
+                        list.push({
+                            id:child.id,
+                            sectionName:"",
+                            name:child.name,
+                            type:child.type,
+                            parent:child.parent
+                        });
                     }
                 }
 
                 if (data.target === "section") {
                     if (child.type === "SECTION") {
-                        list.push(child);
+                        list.push({
+                            id:child.id,
+                            sectionName:"",
+                            name:child.name,
+                            type:child.type,
+                            parent:child.parent
+                        });
                     }
                 }
 
@@ -123,7 +140,13 @@ function indexWidget() {
                     if (child.type === "SECTION") {
                         child.children.forEach((progeny) => {
                             if (progeny.type === "FRAME") {
-                                list.push(progeny);
+                                list.push({
+                                    id:progeny.id,
+                                    sectionName:child.name,
+                                    name:progeny.name,
+                                    type:progeny.type,
+                                    parent:progeny.parent
+                                });
                             }
                         });
                     }
@@ -162,7 +185,7 @@ function indexWidget() {
         return `${yyyy}.${mm}.${dd}`;
     }
 
-    function listDataArrange(list: (FrameNode | SectionNode)[]) {
+    function listDataArrange(list:any[]) {
         if (list.length !== 0) {
             let data: { [key: string]: object } = {};
 
@@ -187,6 +210,7 @@ function indexWidget() {
 
                     data[item.id] = {
                         name: item.name,
+                        sectionName:item.sectionName,
                         pageName: pageName,
                         status: 0,
                         other: "",
@@ -212,7 +236,7 @@ function indexWidget() {
                     }
                 });
 
-                list.forEach((item: FrameNode | SectionNode) => {
+                list.forEach((item) => {
                     if (keyList.indexOf(item.id) === -1) {
                         let pageName;
 
@@ -232,6 +256,7 @@ function indexWidget() {
 
                         existingData[item.id] = {
                             name: item.name,
+                            sectionName:item.sectionName,
                             pageName: pageName,
                             status: 0,
                             other: "",
@@ -382,7 +407,7 @@ function indexWidget() {
                     </AutoLayout>
 
                     <AutoLayout padding={10} width={"fill-parent"} height={"fill-parent"} horizontalAlignItems={"center"} verticalAlignItems={"center"}>
-                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${row.pageName} - ${row.name}`}</Text>
+                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`}</Text>
                     </AutoLayout>
 
                     <AutoLayout
@@ -516,7 +541,7 @@ function indexWidget() {
                     verticalAlignItems={"center"}
                     onClick={(e) => {
                         return new Promise((resolve) => {
-                            figma.showUI(__html__, { width: 420, height: 668 });
+                            figma.showUI(__html__, { width: 420, height: 500 });
                             figma.ui.postMessage(settingData);
                         });
                     }}
@@ -559,7 +584,7 @@ function indexWidget() {
                     verticalAlignItems={"center"}
                     onClick={(e) => {
                         return new Promise((resolve) => {
-                            figma.showUI(__html__, { width: 420, height: 668 });
+                            figma.showUI(__html__, { width: 420, height: 500 });
                             figma.ui.postMessage(settingData);
                         });
                     }}

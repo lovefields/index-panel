@@ -66,6 +66,33 @@
 
     <div class="row">
         <div class="text-area">
+            <p class="title">Visiblity <span class="option">(Optional)</span></p>
+            <p class="caption">How do you want to see the frame name?</p>
+        </div>
+
+        <div class="radio-list">
+            <label class="checkbox --radio">
+                <input type="checkbox" class="input input-page-name" />
+                <svg viewBox="0 0 14 14" class="icon">
+                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                </svg>
+                <span class="text">Visible Page Name (Page-)</span>
+            </label>
+
+            <label class="checkbox --radio">
+                <input type="checkbox" class="input input-section-name" />
+                <svg viewBox="0 0 14 14" class="icon">
+                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                </svg>
+                <span class="text">Visible Section Name ([Section])</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="text-area">
             <p class="title">Other link <span class="option">(Optional)</span></p>
             <p class="caption">If you want set any link for each row.</p>
         </div>
@@ -75,12 +102,7 @@
                 <input type="checkbox" class="input input-other" />
                 <svg viewBox="0 0 14 14" class="icon">
                     <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
-                    <path
-                        class="line"
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"
-                    ></path>
+                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
                 </svg>
                 <span class="text">Yes, I use</span>
             </label>
@@ -106,11 +128,15 @@
         const rule = document.querySelector(".input-rule:checked").value;
         const reg = document.querySelector(".input-reg").value;
         const other = document.querySelector(".input-other").checked;
+        const pageName = document.querySelector(".input-page-name").checked;
+        const sectionName = document.querySelector(".input-section-name").checked;
         let settingData = {
             target: target,
             rule: rule,
             reg: reg,
             other: other,
+            pageName: pageName,
+            sectionName: sectionName,
         };
 
         if (settingData.rule !== "none") {
@@ -162,6 +188,8 @@
             });
             document.querySelector(".input-reg").value = settingData.reg;
             document.querySelector(".input-other").checked = settingData.other;
+            document.querySelector(".input-page-name").checked = settingData.pageName;
+            document.querySelector(".input-section-name").checked = settingData.sectionName;
         }
     };
 </script>
@@ -324,6 +352,19 @@
         color: #616161;
         font-size: 14px;
         font-weight: bold;
+    }
+
+    .checkbox.--radio .text {
+        height: 29px;
+        padding: 0 8px;
+        background: #f1f1f1;
+        border-radius: 5px;
+        line-height: 29px;
+    }
+
+    .checkbox.--radio .input:checked ~ .text {
+        background: #6436ea;
+        color: #f0ebfd;
     }
 
     .checkbox .input:checked ~ .icon .bg {
