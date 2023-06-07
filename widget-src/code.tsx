@@ -87,16 +87,15 @@ function indexWidget() {
     });
 
     function refresh(rowData: string) {
-        let data = JSON.parse(rowData);
-        let list:any[] = [];
-        let pageList = figma.root.children;
+        const data = JSON.parse(rowData);
+        const list: any[] = [];
+        const pageList = figma.root.children;
         let regexp: RegExp = new RegExp(".*");
-
 
         setPageName(data.pageName);
         setSectionName(data.sectionName);
 
-        // make RegExp
+        // 정규식 설정
         if (data.rule === "start") {
             regexp = new RegExp(`^${data.reg}`);
         }
@@ -109,49 +108,49 @@ function indexWidget() {
             regexp = new RegExp(`${data.reg}`);
         }
 
-        // get list
-        pageList.forEach((page) => {
-            page.children.forEach((child) => {
-                if (data.target === "frame") {
+        // 리스트 얻기
+        pageList.filter((page) => {
+            if (data.target === "frame") {
+                page.children.filter((child) => {
                     if (child.type === "FRAME") {
                         list.push({
-                            id:child.id,
-                            sectionName:"",
-                            name:child.name,
-                            type:child.type,
-                            parent:child.parent
+                            id: child.id,
+                            sectionName: "",
+                            name: child.name,
+                            type: child.type,
+                            parent: child.parent,
                         });
                     }
-                }
-
-                if (data.target === "section") {
+                });
+            } else if (data.target === "section") {
+                page.children.filter((child) => {
                     if (child.type === "SECTION") {
                         list.push({
-                            id:child.id,
-                            sectionName:"",
-                            name:child.name,
-                            type:child.type,
-                            parent:child.parent
+                            id: child.id,
+                            sectionName: "",
+                            name: child.name,
+                            type: child.type,
+                            parent: child.parent,
                         });
                     }
-                }
-
-                if (data.target === "frameinsection") {
+                });
+            } else if (data.target === "frameinsection") {
+                page.children.filter((child) => {
                     if (child.type === "SECTION") {
-                        child.children.forEach((progeny) => {
+                        child.children.filter((progeny) => {
                             if (progeny.type === "FRAME") {
                                 list.push({
-                                    id:progeny.id,
-                                    sectionName:child.name,
-                                    name:progeny.name,
-                                    type:progeny.type,
-                                    parent:progeny.parent
+                                    id: progeny.id,
+                                    sectionName: child.name,
+                                    name: progeny.name,
+                                    type: progeny.type,
+                                    parent: progeny.parent,
                                 });
                             }
                         });
                     }
-                }
-            });
+                });
+            }
         });
 
         let accordList = list.filter((item) => {
@@ -168,24 +167,7 @@ function indexWidget() {
         setUpdateData(getToday());
     }
 
-    function getToday() {
-        let today: Date = new Date();
-        let yyyy = today.getFullYear();
-        let mm = String(today.getMonth() + 1);
-        let dd = String(today.getDay());
-
-        if (mm.length === 1) {
-            mm = `0${mm}`;
-        }
-
-        if (dd.length === 1) {
-            dd = `0${dd}`;
-        }
-
-        return `${yyyy}.${mm}.${dd}`;
-    }
-
-    function listDataArrange(list:any[]) {
+    function listDataArrange(list: any[]) {
         if (list.length !== 0) {
             let data: { [key: string]: object } = {};
 
@@ -210,7 +192,7 @@ function indexWidget() {
 
                     data[item.id] = {
                         name: item.name,
-                        sectionName:item.sectionName,
+                        sectionName: item.sectionName,
                         pageName: pageName,
                         status: 0,
                         other: "",
@@ -256,13 +238,13 @@ function indexWidget() {
 
                         existingData[item.id] = {
                             name: item.name,
-                            sectionName:item.sectionName,
+                            sectionName: item.sectionName,
                             pageName: pageName,
                             status: 0,
                             other: "",
                             otherEdit: true,
                         };
-                    }else{
+                    } else {
                         existingData[item.id].name = item.name;
                     }
                 });
@@ -275,6 +257,23 @@ function indexWidget() {
         } else {
             setWidgetStatus("null");
         }
+    }
+
+    function getToday() {
+        let today: Date = new Date();
+        let yyyy = today.getFullYear();
+        let mm = String(today.getMonth() + 1);
+        let dd = String(today.getDay());
+
+        if (mm.length === 1) {
+            mm = `0${mm}`;
+        }
+
+        if (dd.length === 1) {
+            dd = `0${dd}`;
+        }
+
+        return `${yyyy}.${mm}.${dd}`;
     }
 
     // rule text maker
@@ -407,7 +406,9 @@ function indexWidget() {
                     </AutoLayout>
 
                     <AutoLayout padding={10} width={"fill-parent"} height={"fill-parent"} horizontalAlignItems={"center"} verticalAlignItems={"center"}>
-                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`}</Text>
+                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${pageName ? `${row.pageName} - ` : ""} ${
+                            sectionName ? `[${row.sectionName}] ` : ""
+                        }${row.name}`}</Text>
                     </AutoLayout>
 
                     <AutoLayout
@@ -526,7 +527,12 @@ function indexWidget() {
                 spacing={20}
                 stroke={"#e0d7fb"}
                 strokeWidth={1}
-                effect={{ type: "drop-shadow", color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 }, offset: { x: 0, y: 4 }, blur: 48 }}
+                effect={{
+                    type: "drop-shadow",
+                    color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 },
+                    offset: { x: 0, y: 4 },
+                    blur: 48,
+                }}
             >
                 <Text fill={"#333"} fontFamily={"Gothic A1"} fontSize={20} fontWeight={800} horizontalAlignText={"center"}>
                     Create index lists!&#10;You can manage your page efficiently.
@@ -569,7 +575,12 @@ function indexWidget() {
                 spacing={20}
                 stroke={"#e0d7fb"}
                 strokeWidth={1}
-                effect={{ type: "drop-shadow", color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 }, offset: { x: 0, y: 4 }, blur: 48 }}
+                effect={{
+                    type: "drop-shadow",
+                    color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 },
+                    offset: { x: 0, y: 4 },
+                    blur: 48,
+                }}
             >
                 <Text fill={"#333"} fontFamily={"Gothic A1"} fontSize={20} fontWeight={800} horizontalAlignText={"center"}>
                     Didn’t make list. Re-setting please.
@@ -614,7 +625,12 @@ function indexWidget() {
                 spacing={20}
                 stroke={"#e0d7fb"}
                 strokeWidth={1}
-                effect={{ type: "drop-shadow", color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 }, offset: { x: 0, y: 4 }, blur: 48 }}
+                effect={{
+                    type: "drop-shadow",
+                    color: { r: 0.04, g: 0.012, b: 0.121, a: 0.1 },
+                    offset: { x: 0, y: 4 },
+                    blur: 48,
+                }}
             >
                 <AutoLayout width={"fill-parent"} direction={"vertical"} spacing={10}>
                     <Input
