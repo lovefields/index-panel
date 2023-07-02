@@ -33,8 +33,9 @@ function indexWidget() {
         ],
         ({ propertyName, propertyValue }) => {
             if (propertyName === "setting") {
+                setPageList();
                 return new Promise((resolve) => {
-                    figma.showUI(__html__, { width: 420, height: 500 });
+                    figma.showUI(__html__, { width: 840, height: 822 });
                     figma.ui.postMessage(settingData);
                 });
             }
@@ -86,10 +87,54 @@ function indexWidget() {
         };
     });
 
+    function setPageList() {
+        const pageList = figma.root.children;
+        const pageData = [
+            {
+                id: "all",
+                name: "All",
+                checked: false,
+            },
+        ];
+
+        if (settingData === "") {
+            const firstData = {
+                target: "frame",
+                rule: "none",
+                reg: "",
+                other: false,
+                pageName: false,
+                sectionName: false,
+                pageList: [],
+            };
+
+            pageList.forEach((page: PageNode) => {
+                pageData.push({
+                    id: page.id,
+                    name: page.name,
+                    checked: false,
+                });
+            });
+
+            firstData.pageList = pageData;
+            setSettingData(JSON.stringify(firstData));
+        } else {
+            const preData = JSON.parse(settingData);
+
+            console.log("preData",preData);
+        }
+
+        // console.log(settingData);
+        // console.log("pageList", figma.root.children);
+        // setSettingData
+    }
+
     function refresh(rowData: string) {
         const data = JSON.parse(rowData);
         const list: any[] = [];
         const pageList = figma.root.children;
+        let childList: any[] = [];
+        let typeName: string = "";
         let regexp: RegExp = new RegExp(".*");
 
         setPageName(data.pageName);
@@ -108,52 +153,45 @@ function indexWidget() {
             regexp = new RegExp(`${data.reg}`);
         }
 
-        // 리스트 얻기
-        pageList.filter((page) => {
-            if (data.target === "frame") {
-                page.children.filter((child) => {
-                    if (child.type === "FRAME") {
-                        list.push({
-                            id: child.id,
-                            sectionName: "",
-                            name: child.name,
-                            type: child.type,
-                            parent: child.parent,
-                        });
-                    }
-                });
-            } else if (data.target === "section") {
-                page.children.filter((child) => {
-                    if (child.type === "SECTION") {
-                        list.push({
-                            id: child.id,
-                            sectionName: "",
-                            name: child.name,
-                            type: child.type,
-                            parent: child.parent,
-                        });
-                    }
-                });
-            } else if (data.target === "frameinsection") {
-                page.children.filter((child) => {
-                    if (child.type === "SECTION") {
-                        child.children.filter((progeny) => {
-                            if (progeny.type === "FRAME") {
-                                list.push({
-                                    id: progeny.id,
-                                    sectionName: child.name,
-                                    name: progeny.name,
-                                    type: progeny.type,
-                                    parent: progeny.parent,
-                                });
-                            }
-                        });
-                    }
-                });
-            }
+        pageList.forEach((page) => {
+            childList = childList.concat(page.children);
         });
 
-        let accordList = list.filter((item) => {
+        if (data.target === "frameinsection") {
+            typeName = "SECTION";
+        } else {
+            typeName = data.target.toUpperCase();
+        }
+
+        childList = childList.filter((item) => item.type === typeName);
+
+        if (data.target === "frameinsection") {
+            childList.forEach((section) => {
+                const targetChild = section.children.filter((row: any) => row.type === "FRAME");
+
+                targetChild.forEach((target: any) => {
+                    list.push({
+                        id: target.id,
+                        sectionName: section.name,
+                        name: target.name,
+                        type: target.type,
+                        parent: target.parent,
+                    });
+                });
+            });
+        } else {
+            childList.forEach((target) => {
+                list.push({
+                    id: target.id,
+                    sectionName: "",
+                    name: target.name,
+                    type: target.type,
+                    parent: target.parent,
+                });
+            });
+        }
+
+        const accordList = list.filter((item) => {
             if (data.rule === "none") {
                 return item;
             } else {
@@ -359,8 +397,7 @@ function indexWidget() {
                             placeholder="-"
                             onTextEditEnd={(e) => {
                                 if (e.characters !== "") {
-                                    let urlRegex =
-                                        "^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$";
+                                    let urlRegex = "^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$";
                                     let url = new RegExp(urlRegex, "i");
 
                                     if (url.test(e.characters) === true) {
@@ -406,9 +443,7 @@ function indexWidget() {
                     </AutoLayout>
 
                     <AutoLayout padding={10} width={"fill-parent"} height={"fill-parent"} horizontalAlignItems={"center"} verticalAlignItems={"center"}>
-                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${pageName ? `${row.pageName} - ` : ""} ${
-                            sectionName ? `[${row.sectionName}] ` : ""
-                        }${row.name}`}</Text>
+                        <Text width={"fill-parent"} fill={"#333"} fontSize={16} fontFamily={"Gothic A1"} fontWeight={500}>{`${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`}</Text>
                     </AutoLayout>
 
                     <AutoLayout
@@ -547,7 +582,8 @@ function indexWidget() {
                     verticalAlignItems={"center"}
                     onClick={(e) => {
                         return new Promise((resolve) => {
-                            figma.showUI(__html__, { width: 420, height: 500 });
+                            setPageList();
+                            figma.showUI(__html__, { width: 840, height: 822 });
                             figma.ui.postMessage(settingData);
                         });
                     }}
@@ -595,7 +631,8 @@ function indexWidget() {
                     verticalAlignItems={"center"}
                     onClick={(e) => {
                         return new Promise((resolve) => {
-                            figma.showUI(__html__, { width: 420, height: 500 });
+                            setPageList();
+                            figma.showUI(__html__, { width: 840, height: 822 });
                             figma.ui.postMessage(settingData);
                         });
                     }}

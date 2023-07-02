@@ -1,111 +1,125 @@
 <div class="setting-box">
-    <div class="row">
-        <div class="text-area">
-            <p class="title">Target</p>
-            <p class="caption">Target is all ways top layers.</p>
+    <div class="wrap">
+        <div class="col">
+            <div class="row">
+                <div class="text-area">
+                    <p class="title">Target</p>
+                    <p class="caption">Target is all ways top layers.</p>
+                </div>
+
+                <div class="radio-list">
+                    <label class="radio">
+                        <input class="input input-target" type="radio" name="target" value="frame" checked />
+                        <span class="path"></span>
+                        <span class="text">Frame</span>
+                    </label>
+
+                    <label class="radio">
+                        <input class="input input-target" type="radio" name="target" value="section" />
+                        <span class="path"></span>
+                        <span class="text">Section</span>
+                    </label>
+
+                    <label class="radio">
+                        <input class="input input-target" type="radio" name="target" value="frameinsection" />
+                        <span class="path"></span>
+                        <span class="text">Frame in Section</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="text-area">
+                    <p class="title">Rule</p>
+                    <p class="caption">If you want set name rule, choose a rule below.</p>
+                </div>
+
+                <div class="radio-list">
+                    <label class="radio">
+                        <input class="input input-rule" type="radio" name="rule" value="none" checked />
+                        <span class="path"></span>
+                        <span class="text">None</span>
+                    </label>
+
+                    <label class="radio">
+                        <input class="input input-rule" type="radio" name="rule" value="start" />
+                        <span class="path"></span>
+                        <span class="text">Name start to</span>
+                    </label>
+
+                    <label class="radio">
+                        <input class="input input-rule" type="radio" name="rule" value="end" />
+                        <span class="path"></span>
+                        <span class="text">Name end to</span>
+                    </label>
+
+                    <label class="radio">
+                        <input class="input input-rule" type="radio" name="rule" value="reg" />
+                        <span class="path"></span>
+                        <span class="text">Regular expression</span>
+                    </label>
+                </div>
+
+                <div class="reg-area">
+                    <p class="caption">Enter the name you want to set as a rule below.</p>
+                    <input type="text" class="input input-reg" placeholder="ex) Page" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="text-area">
+                    <p class="title">Other link <span class="option">(Optional)</span></p>
+                    <p class="caption">If you want set any link for each row.</p>
+                </div>
+
+                <div class="content-area">
+                    <label class="checkbox">
+                        <input type="checkbox" class="input input-other" />
+                        <svg viewBox="0 0 14 14" class="icon">
+                            <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                            <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                        </svg>
+                        <span class="text">Yes, I use</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="text-area">
+                    <p class="title">Visiblity <span class="option">(Optional)</span></p>
+                    <p class="caption">How do you want to see the frame name?</p>
+                </div>
+
+                <div class="radio-list">
+                    <label class="checkbox --radio">
+                        <input type="checkbox" class="input input-page-name" />
+                        <svg viewBox="0 0 14 14" class="icon">
+                            <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                            <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                        </svg>
+                        <span class="text">Visible Page Name (Page-)</span>
+                    </label>
+
+                    <label class="checkbox --radio">
+                        <input type="checkbox" class="input input-section-name" />
+                        <svg viewBox="0 0 14 14" class="icon">
+                            <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                            <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                        </svg>
+                        <span class="text">Visible Section Name ([Section])</span>
+                    </label>
+                </div>
+            </div>
         </div>
 
-        <div class="radio-list">
-            <label class="radio">
-                <input class="input input-target" type="radio" name="target" value="frame" checked />
-                <span class="path"></span>
-                <span class="text">Frame</span>
-            </label>
+        <div class="col">
+            <div class="row --page-list">
+                <div class="text-area">
+                    <p class="title">Page List</p>
+                </div>
 
-            <label class="radio">
-                <input class="input input-target" type="radio" name="target" value="section" />
-                <span class="path"></span>
-                <span class="text">Section</span>
-            </label>
-
-            <label class="radio">
-                <input class="input input-target" type="radio" name="target" value="frameinsection" />
-                <span class="path"></span>
-                <span class="text">Frame in Section</span>
-            </label>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="text-area">
-            <p class="title">Rule</p>
-            <p class="caption">If you want set name rule, choose a rule below.</p>
-        </div>
-
-        <div class="radio-list">
-            <label class="radio">
-                <input class="input input-rule" type="radio" name="rule" value="none" checked />
-                <span class="path"></span>
-                <span class="text">None</span>
-            </label>
-
-            <label class="radio">
-                <input class="input input-rule" type="radio" name="rule" value="start" />
-                <span class="path"></span>
-                <span class="text">Name start to</span>
-            </label>
-
-            <label class="radio">
-                <input class="input input-rule" type="radio" name="rule" value="end" />
-                <span class="path"></span>
-                <span class="text">Name end to</span>
-            </label>
-
-            <label class="radio">
-                <input class="input input-rule" type="radio" name="rule" value="reg" />
-                <span class="path"></span>
-                <span class="text">Regular expression</span>
-            </label>
-        </div>
-
-        <div class="reg-area">
-            <p class="caption">Enter the name you want to set as a rule below.</p>
-            <input type="text" class="input input-reg" placeholder="ex) Page" />
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="text-area">
-            <p class="title">Visiblity <span class="option">(Optional)</span></p>
-            <p class="caption">How do you want to see the frame name?</p>
-        </div>
-
-        <div class="radio-list">
-            <label class="checkbox --radio">
-                <input type="checkbox" class="input input-page-name" />
-                <svg viewBox="0 0 14 14" class="icon">
-                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
-                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
-                </svg>
-                <span class="text">Visible Page Name (Page-)</span>
-            </label>
-
-            <label class="checkbox --radio">
-                <input type="checkbox" class="input input-section-name" />
-                <svg viewBox="0 0 14 14" class="icon">
-                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
-                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
-                </svg>
-                <span class="text">Visible Section Name ([Section])</span>
-            </label>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="text-area">
-            <p class="title">Other link <span class="option">(Optional)</span></p>
-            <p class="caption">If you want set any link for each row.</p>
-        </div>
-
-        <div class="content-area">
-            <label class="checkbox">
-                <input type="checkbox" class="input input-other" />
-                <svg viewBox="0 0 14 14" class="icon">
-                    <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
-                    <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
-                </svg>
-                <span class="text">Yes, I use</span>
-            </label>
+                <div class="page-list"></div>
+            </div>
         </div>
     </div>
 
@@ -137,6 +151,7 @@
             other: other,
             pageName: pageName,
             sectionName: sectionName,
+            pageList: [],
         };
 
         if (settingData.rule !== "none") {
@@ -169,6 +184,7 @@
     window.onmessage = (event) => {
         if (event.data.pluginMessage !== "") {
             let settingData = JSON.parse(event.data.pluginMessage);
+            console.log(settingData);
 
             document.querySelectorAll(".input-target").forEach((item) => {
                 let value = item.value;
@@ -190,6 +206,24 @@
             document.querySelector(".input-other").checked = settingData.other;
             document.querySelector(".input-page-name").checked = settingData.pageName;
             document.querySelector(".input-section-name").checked = settingData.sectionName;
+
+            let pageListHtml = "";
+
+            settingData.pageList.forEach((page) => {
+                console.log(page);
+                pageListHtml += `
+                    <label class="checkbox">
+                        <input type="checkbox" class="input input-page" value="${page.id}" ${page.checked ? checked : ""}/>
+                        <svg viewBox="0 0 14 14" class="icon">
+                            <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
+                            <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
+                        </svg>
+                        <span class="text">${page.name}</span>
+                    </label>
+                `;
+            });
+
+            document.querySelector(".page-list").innerHTML = pageListHtml;
         }
     };
 </script>
@@ -210,10 +244,20 @@
     }
 
     .setting-box {
+        padding: 20px;
+    }
+
+    .wrap {
+        display: flex;
+        column-gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .wrap .col {
+        flex: 1;
         display: flex;
         flex-direction: column;
         row-gap: 30px;
-        padding: 20px;
     }
 
     .row,
@@ -221,6 +265,15 @@
         display: flex;
         flex-direction: column;
         row-gap: 10px;
+    }
+
+    .row.--page-list,
+    .row.--page-list .page-list {
+        flex: 1;
+    }
+
+    .row.--page-list .page-list {
+        overflow-y: auto;
     }
 
     .row .text-area {
