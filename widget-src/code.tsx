@@ -1,15 +1,52 @@
 const { widget } = figma;
 const { useWidgetId, Frame, useSyncedState, usePropertyMenu, useEffect, AutoLayout, Text, Input, SVG } = widget;
 
+interface PageItem {
+    id: string;
+    name: string;
+    checked: boolean;
+}
+
+interface SettingData {
+    target: string;
+    rule: string;
+    reg: string;
+    other: boolean;
+    pageName: boolean;
+    sectionName: boolean;
+    pageList: PageItem[];
+}
+
+interface indexItem {
+    name: string;
+    sectionName: string;
+    pageName: string;
+    status: number;
+    other: string;
+    otherEdit: boolean;
+}
+
+interface indexObject {
+    [key: string]: indexItem;
+}
+
 function indexWidget() {
-    const [widgetStatus, setWidgetStatus] = useSyncedState("widgetStatus", "new");
-    const [settingData, setSettingData] = useSyncedState("settingData", "");
-    const [indexData, setIndexData] = useSyncedState("indexData", "{}");
-    const [indexTitle, setIndexTitle] = useSyncedState("indexTitle", "");
-    const [indexCaption, setIndexCaption] = useSyncedState("indexCaption", "");
-    const [updateData, setUpdateData] = useSyncedState("updateData", "");
-    const [pageName, setPageName] = useSyncedState("pageName", false);
-    const [sectionName, setSectionName] = useSyncedState("sectionName", false);
+    const [widgetStatus, setWidgetStatus] = useSyncedState<string>("widgetStatus", "new");
+    const [settingData, setSettingData] = useSyncedState<SettingData>("settingData", {
+        target: "frame",
+        rule: "none",
+        reg: "",
+        other: false,
+        pageName: false,
+        sectionName: false,
+        pageList: [],
+    });
+    const [indexData, setIndexData] = useSyncedState<indexObject>("indexData", {});
+    const [indexTitle, setIndexTitle] = useSyncedState<string>("indexTitle", "");
+    const [indexCaption, setIndexCaption] = useSyncedState<string>("indexCaption", "");
+    const [updateData, setUpdateData] = useSyncedState<string>("updateData", "");
+    const [pageName, setPageName] = useSyncedState<boolean>("pageName", false);
+    const [sectionName, setSectionName] = useSyncedState<boolean>("sectionName", false);
     let widgetId = useWidgetId();
     let structure;
 
@@ -75,8 +112,8 @@ function indexWidget() {
     useEffect(() => {
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
-                setSettingData(JSON.stringify(msg.data));
-                refresh(JSON.stringify(msg.data));
+                setSettingData(msg.data);
+                refresh(msg.data);
             }
 
             if (msg.type !== "reg") {
@@ -89,25 +126,9 @@ function indexWidget() {
 
     function setPageList() {
         const pageList = figma.root.children;
-        const pageData = [
-            {
-                id: "all",
-                name: "All",
-                checked: false,
-            },
-        ];
+        const pageData: PageItem[] = [];
 
-        if (settingData === "") {
-            const firstData = {
-                target: "frame",
-                rule: "none",
-                reg: "",
-                other: false,
-                pageName: false,
-                sectionName: false,
-                pageList: [],
-            };
-
+        if (settingData.pageList.length === 0) {
             pageList.forEach((page: PageNode) => {
                 pageData.push({
                     id: page.id,
@@ -115,27 +136,55 @@ function indexWidget() {
                     checked: false,
                 });
             });
-
-            firstData.pageList = pageData;
-            setSettingData(JSON.stringify(firstData));
         } else {
-            const preData = JSON.parse(settingData);
+            const preData = settingData;
 
-            console.log("preData",preData);
+            preData.pageList.forEach((item) => {
+                pageList.forEach((page) => {
+                    if (item.id === page.id) {
+                        pageData.push(item);
+                    }
+                });
+            });
+
+            pageList.forEach((page) => {
+                const hasList = preData.pageList.filter((item) => item.id === page.id);
+
+                if (hasList.length === 0) {
+                    pageData.push({
+                        id: page.id,
+                        name: page.name,
+                        checked: false,
+                    });
+                }
+            });
         }
 
-        // console.log(settingData);
-        // console.log("pageList", figma.root.children);
-        // setSettingData
+        setSettingData(
+            Object.assign(settingData, {
+                pageList: pageData,
+            })
+        );
     }
 
-    function refresh(rowData: string) {
-        const data = JSON.parse(rowData);
+    function refresh(rowData: SettingData) {
+        const data = rowData;
         const list: any[] = [];
-        const pageList = figma.root.children;
+        const pageSelected = data.pageList.filter((page) => page.checked === true);
+        let pageList: any = [];
         let childList: any[] = [];
         let typeName: string = "";
         let regexp: RegExp = new RegExp(".*");
+
+        if (pageSelected.length > 0) {
+            pageList = [];
+
+            pageSelected.forEach((data) => {
+                pageList.push(figma.getNodeById(data.id));
+            });
+        } else {
+            pageList = figma.root.children;
+        }
 
         setPageName(data.pageName);
         setSectionName(data.sectionName);
@@ -153,7 +202,7 @@ function indexWidget() {
             regexp = new RegExp(`${data.reg}`);
         }
 
-        pageList.forEach((page) => {
+        pageList.forEach((page: PageNode) => {
             childList = childList.concat(page.children);
         });
 
@@ -207,9 +256,10 @@ function indexWidget() {
 
     function listDataArrange(list: any[]) {
         if (list.length !== 0) {
-            let data: { [key: string]: object } = {};
+            let data: { [key: string]: indexItem } = {};
+            let keyList: string[] = Object.keys(indexData);
 
-            if (indexData === "{}") {
+            if (keyList.length === 0) {
                 // just add
                 list.forEach((item) => {
                     let pageName;
@@ -239,10 +289,9 @@ function indexWidget() {
                 });
             } else {
                 // arrange
-                let existingData = JSON.parse(indexData);
-                let keyList: string[] = Object.keys(existingData);
+                let existingData = indexData;
 
-                keyList.map((key: string) => {
+                keyList.forEach((key: string) => {
                     let hasKey: boolean = false;
 
                     list.forEach((item: FrameNode | SectionNode) => {
@@ -290,7 +339,7 @@ function indexWidget() {
                 data = existingData;
             }
 
-            setIndexData(JSON.stringify(data));
+            setIndexData(data);
             setWidgetStatus("have");
         } else {
             setWidgetStatus("null");
@@ -315,7 +364,7 @@ function indexWidget() {
     }
 
     // rule text maker
-    function ruleText(option: { [key: string]: string }) {
+    function ruleText(option: any) {
         if (option.rule === "none") {
             return (
                 <AutoLayout spacing={3}>
@@ -353,11 +402,11 @@ function indexWidget() {
     }
 
     // list structure maker
-    function makeListStrucutre(option: { [key: string]: string | boolean }) {
+    function makeListStrucutre(option: any) {
         const arrowRight = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.64557 3.89733C6.84034 3.70158 7.15693 3.70079 7.35267 3.89557L11.6677 8.18916C11.762 8.283 11.815 8.41055 11.815 8.54359C11.815 8.67663 11.762 8.80418 11.6677 8.89802L7.35267 13.1916C7.15693 13.3864 6.84034 13.3856 6.64557 13.1899C6.45079 12.9941 6.45158 12.6775 6.64733 12.4828L10.6061 8.54359L6.64733 4.60443C6.45158 4.40966 6.45079 4.09307 6.64557 3.89733Z" fill="#333"/></svg>`;
         const pencli = `<svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.5558 4.51626C13.6399 4.43208 13.7746 4.43208 13.8587 4.51626L14.9933 5.65082L14.9986 5.6561C15.0812 5.73663 15.0893 5.86982 14.998 5.96532L13.9787 6.98457L12.5331 5.53893L13.5558 4.51626ZM14.6984 3.67657C14.1505 3.12864 13.264 3.12864 12.7161 3.67657L11.2736 5.11908C11.2538 5.13888 11.2357 5.15972 11.2192 5.18144L3.93976 12.453C3.82827 12.5643 3.76562 12.7155 3.76562 12.873V15.1584C3.76562 15.4863 4.03146 15.7521 4.35938 15.7521H6.6447C6.80218 15.7521 6.9532 15.6896 7.06455 15.5782L14.4878 8.15496C14.4899 8.15292 14.4919 8.15087 14.4939 8.14881L15.8411 6.8016L15.8464 6.79625C16.3843 6.24455 16.3928 5.36005 15.8307 4.80881L14.6984 3.67657ZM13.1391 7.8243L11.6972 6.38244L4.95312 13.1192V14.5646H6.39876L13.1391 7.8243Z" fill="#6436EA"/></svg>`;
-        let listData = JSON.parse(indexData);
-        let keyList: string[] = Object.keys(listData);
+        let listData = indexData;
+        let keyList: string[] = Object.keys(indexData);
         let count: number = 1;
         let list = keyList.map((key: string) => {
             let row = listData[key];
@@ -403,7 +452,7 @@ function indexWidget() {
                                     if (url.test(e.characters) === true) {
                                         listData[key].other = e.characters;
                                         listData[key].otherEdit = false;
-                                        setIndexData(JSON.stringify(listData));
+                                        setIndexData(listData);
                                     } else {
                                         figma.notify("You must enter only text that is available as a link.");
                                     }
@@ -427,7 +476,7 @@ function indexWidget() {
                             src={pencli}
                             onClick={(e) => {
                                 listData[key].otherEdit = true;
-                                setIndexData(JSON.stringify(listData));
+                                setIndexData(listData);
                             }}
                         ></SVG>
                     </AutoLayout>
@@ -489,7 +538,7 @@ function indexWidget() {
                                 } else {
                                     listData[key].status += 1;
                                 }
-                                setIndexData(JSON.stringify(listData));
+                                setIndexData(listData);
                             }}
                         >
                             <Text fill={statusData.text} fontSize={12} fontWeight={700} fontFamily={"Gothic A1"}>
@@ -646,7 +695,7 @@ function indexWidget() {
     }
 
     if (widgetStatus === "have") {
-        let optionData = JSON.parse(settingData);
+        let optionData = settingData;
 
         structure = (
             <AutoLayout

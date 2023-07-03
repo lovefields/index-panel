@@ -118,7 +118,7 @@
                     <p class="title">Page List</p>
                 </div>
 
-                <div class="page-list"></div>
+                <div class="radio-list page-list"></div>
             </div>
         </div>
     </div>
@@ -144,6 +144,7 @@
         const other = document.querySelector(".input-other").checked;
         const pageName = document.querySelector(".input-page-name").checked;
         const sectionName = document.querySelector(".input-section-name").checked;
+        const pageList = document.querySelectorAll(".input-page");
         let settingData = {
             target: target,
             rule: rule,
@@ -153,6 +154,18 @@
             sectionName: sectionName,
             pageList: [],
         };
+
+        pageList.forEach((page) => {
+            const id = page.value;
+            const checked = page.checked;
+            const name = page.dataset["name"];
+
+            settingData.pageList.push({
+                id: id,
+                name: name,
+                checked: checked,
+            });
+        });
 
         if (settingData.rule !== "none") {
             if (settingData.reg === "") {
@@ -182,38 +195,35 @@
     }
 
     window.onmessage = (event) => {
-        if (event.data.pluginMessage !== "") {
-            let settingData = JSON.parse(event.data.pluginMessage);
-            console.log(settingData);
+        let settingData = event.data.pluginMessage;
 
-            document.querySelectorAll(".input-target").forEach((item) => {
-                let value = item.value;
+        document.querySelectorAll(".input-target").forEach((item) => {
+            let value = item.value;
 
-                item.checekd = false;
-                if (value === settingData.target) {
-                    item.checked = true;
-                }
-            });
-            document.querySelectorAll(".input-rule").forEach((item) => {
-                let value = item.value;
+            item.checekd = false;
+            if (value === settingData.target) {
+                item.checked = true;
+            }
+        });
+        document.querySelectorAll(".input-rule").forEach((item) => {
+            let value = item.value;
 
-                item.checekd = false;
-                if (value === settingData.rule) {
-                    item.checked = true;
-                }
-            });
-            document.querySelector(".input-reg").value = settingData.reg;
-            document.querySelector(".input-other").checked = settingData.other;
-            document.querySelector(".input-page-name").checked = settingData.pageName;
-            document.querySelector(".input-section-name").checked = settingData.sectionName;
+            item.checekd = false;
+            if (value === settingData.rule) {
+                item.checked = true;
+            }
+        });
+        document.querySelector(".input-reg").value = settingData.reg;
+        document.querySelector(".input-other").checked = settingData.other;
+        document.querySelector(".input-page-name").checked = settingData.pageName;
+        document.querySelector(".input-section-name").checked = settingData.sectionName;
 
-            let pageListHtml = "";
+        let pageListHtml = "";
 
-            settingData.pageList.forEach((page) => {
-                console.log(page);
-                pageListHtml += `
-                    <label class="checkbox">
-                        <input type="checkbox" class="input input-page" value="${page.id}" ${page.checked ? checked : ""}/>
+        settingData.pageList.forEach((page) => {
+            pageListHtml += `
+                    <label class="checkbox --radio">
+                        <input type="checkbox" class="input input-page" value="${page.id}" ${page.checked ? "checked" : ""} data-name="${page.name}"/>
                         <svg viewBox="0 0 14 14" class="icon">
                             <rect class="bg" x="0" y="0" width="14" height="14" rx="4"></rect>
                             <path class="line" fill-rule="evenodd" clip-rule="evenodd" d="M10.995 5.25507C11.2683 5.52844 11.2683 5.97166 10.995 6.24502L6.79496 10.445C6.5216 10.7184 6.07838 10.7184 5.80501 10.445L3.00501 7.64502C2.73165 7.37166 2.73165 6.92844 3.00501 6.65507C3.27838 6.38171 3.7216 6.38171 3.99496 6.65507L6.29999 8.9601L10.005 5.25507C10.2784 4.98171 10.7216 4.98171 10.995 5.25507Z"></path>
@@ -221,10 +231,9 @@
                         <span class="text">${page.name}</span>
                     </label>
                 `;
-            });
+        });
 
-            document.querySelector(".page-list").innerHTML = pageListHtml;
-        }
+        document.querySelector(".page-list").innerHTML = pageListHtml;
     };
 </script>
 
