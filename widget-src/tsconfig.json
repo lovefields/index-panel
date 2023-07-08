@@ -3,9 +3,9 @@
     "jsx": "react",
     "jsxFactory": "figma.widget.h",
     "jsxFragmentFactory": "figma.widget.Fragment",
-    "target": "es6",
+    "target": "ES2017",
     "lib": [
-      "es6"
+      "ES7"
     ],
     "strict": true,
     "typeRoots": [
