@@ -180,7 +180,15 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
             list.forEach((row) => {
                 let hasItem = false;
                 let count = 0;
-                let data;
+                let data: indexItem = {
+                    id: "",
+                    name: "",
+                    sectionName: "",
+                    pageName: "",
+                    status: 0,
+                    other: "",
+                    otherEdit: true,
+                };
                 let pageName;
 
                 indexData.forEach((item, i) => {
@@ -205,6 +213,7 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
                     }
                 }
 
+                // @ts-ignore : IDE가 인식못함
                 if (hasItem === true) {
                     indexData[count] = {
                         id: data.id,

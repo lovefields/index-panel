@@ -87,6 +87,48 @@ function indexWidget() {
                     figma.notify("Something wrong");
                 }
             }
+
+            if (propertyName === "csv") {
+                let csvData = "data:text/csv;charset=utf-8,\uFEFF";
+
+                csvData += "No,Frame Name,Status\r\n";
+
+                indexData.forEach((row, count) => {
+                    const frameName = `${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`;
+                    let statusName = "Not Started";
+
+                    if (row.status === 1) {
+                        statusName = "In progress";
+                    }
+
+                    if (row.status === 2) {
+                        statusName = "Completed";
+                    }
+
+                    csvData += `${count + 1},${frameName},${statusName}\r\n`;
+                });
+
+                return new Promise((resolve) => {
+                    figma.showUI(`
+                        <script>
+                            window.onmessage = (event) => {
+                                const data = event.data.pluginMessage;
+                                const link = document.createElement("a");
+                                link.href = encodeURI(data.content);
+                                link.download = data.title;
+                                document.body.appendChild(link);
+                                link.click();
+
+                                parent.postMessage({ pluginMessage: { type: "close" } }, "*");
+                            };
+                        </script>
+                    `);
+                    figma.ui.postMessage({
+                        title: indexTitle ? indexTitle : "Index Panel",
+                        content: csvData,
+                    });
+                });
+            }
         }
     );
 
