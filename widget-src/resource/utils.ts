@@ -1,4 +1,8 @@
 import { PageItem, SettingData, indexItem } from "./type";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 export function setPageList(figma: PluginAPI, settingData: SettingData, setSettingData: Function) {
     const pageList = figma.root.children;
@@ -207,9 +211,9 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
                         name: data.name,
                         sectionName: data.sectionName,
                         pageName: pageName,
-                        status: 0,
-                        other: "",
-                        otherEdit: true,
+                        status: data.status,
+                        other: data.other,
+                        otherEdit: data.otherEdit,
                     };
                 } else {
                     indexData.push({
@@ -235,18 +239,5 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
 }
 
 function getToday() {
-    const today: Date = new Date();
-    const yyyy = today.getFullYear();
-    let mm = String(today.getMonth() + 1);
-    let dd = String(today.getDay());
-
-    if (mm.length === 1) {
-        mm = `0${mm}`;
-    }
-
-    if (dd.length === 1) {
-        dd = `0${dd}`;
-    }
-
-    return `${yyyy}.${mm}.${dd}`;
+    return  dayjs().utc().format("YYYY.MM.DD HH:mm (UTC)");
 }
