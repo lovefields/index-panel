@@ -3,7 +3,7 @@ import { makeListStrucutre, ruleText } from "./resource/ui";
 import { refresh, setPageList } from "./resource/utils";
 
 const { widget } = figma;
-const { useWidgetId, useSyncedState, usePropertyMenu, useEffect, AutoLayout, Text, Input } = widget;
+const { useWidgetNodeId, useSyncedState, usePropertyMenu, useEffect, AutoLayout, Text, Input } = widget;
 
 function indexWidget() {
     const [widgetStatus, setWidgetStatus] = useSyncedState<string>("widgetStatus", "new");
@@ -22,7 +22,7 @@ function indexWidget() {
     const [updateData, setUpdateData] = useSyncedState<string>("updateData", "");
     const [pageName, setPageName] = useSyncedState<boolean>("pageName", false);
     const [sectionName, setSectionName] = useSyncedState<boolean>("sectionName", false);
-    let widgetId = useWidgetId();
+    let widgetId = useWidgetNodeId();
     let structure;
 
     usePropertyMenu(
@@ -58,7 +58,7 @@ function indexWidget() {
             }
 
             if (propertyName === "refresh") {
-                refresh(settingData, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData);
+                refresh(figma, settingData, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
             }
 
             if (propertyName === "creat") {
@@ -136,7 +136,7 @@ function indexWidget() {
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
                 setSettingData(msg.data);
-                refresh(msg.data, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData);
+                refresh(figma, msg.data, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
             }
 
             if (msg.type !== "reg") {

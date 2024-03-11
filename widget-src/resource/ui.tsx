@@ -1,7 +1,7 @@
 import type { SettingData, indexItem } from "./type";
 
 const { widget } = figma;
-const { useWidgetId, useSyncedState, usePropertyMenu, useEffect, AutoLayout, Text, Input, SVG } = widget;
+const { useSyncedState, usePropertyMenu, useEffect, AutoLayout, Text, Input, SVG } = widget;
 
 // rule text maker
 export function ruleText(option: SettingData) {

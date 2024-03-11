@@ -8,37 +8,23 @@ export function setPageList(figma: PluginAPI, settingData: SettingData, setSetti
     const pageList = figma.root.children;
     const pageData: PageItem[] = [];
 
-    if (settingData.pageList.length === 0) {
-        pageList.forEach((page: PageNode) => {
+    pageList.forEach((page) => {
+        const listData = settingData.pageList.find((item) => item.id === page.id);
+
+        if (listData === undefined) {
             pageData.push({
                 id: page.id,
                 name: page.name,
                 checked: false,
             });
-        });
-    } else {
-        const preData = settingData;
-
-        preData.pageList.forEach((item) => {
-            pageList.forEach((page) => {
-                if (item.id === page.id) {
-                    pageData.push(item);
-                }
+        } else {
+            pageData.push({
+                id: page.id,
+                name: page.name,
+                checked: listData.checked,
             });
-        });
-
-        pageList.forEach((page) => {
-            const hasList = preData.pageList.filter((item) => item.id === page.id);
-
-            if (hasList.length === 0) {
-                pageData.push({
-                    id: page.id,
-                    name: page.name,
-                    checked: false,
-                });
-            }
-        });
-    }
+        }
+    });
 
     setSettingData(
         Object.assign(settingData, {
@@ -47,7 +33,8 @@ export function setPageList(figma: PluginAPI, settingData: SettingData, setSetti
     );
 }
 
-export function refresh(rowData: SettingData, indexData: indexItem[], setPageName: Function, setSectionName: Function, setUpdateData: Function, setWidgetStatus: Function, setIndexData: Function) {
+export function refresh(figma: PluginAPI, rowData: SettingData, indexData: indexItem[], setPageName: Function, setSectionName: Function, setUpdateData: Function, setWidgetStatus: Function, setIndexData: Function, setSettingData: Function) {
+    setPageList(figma, rowData, setSettingData);
     const data = rowData;
     const list: any[] = [];
     const pageSelected = data.pageList.filter((page) => page.checked === true);
@@ -130,11 +117,11 @@ export function refresh(rowData: SettingData, indexData: indexItem[], setPageNam
         }
     });
 
-    listDataArrange(accordList, indexData, setWidgetStatus, setIndexData);
+    listDataArrange(figma, accordList, indexData, setWidgetStatus, setIndexData, rowData);
     setUpdateData(getToday());
 }
 
-export function listDataArrange(list: any[], indexData: indexItem[], setWidgetStatus: Function, setIndexData: Function) {
+export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexItem[], setWidgetStatus: Function, setIndexData: Function, settingData: SettingData) {
     if (list.length !== 0) {
         let data: indexItem[] = [];
 
@@ -237,7 +224,30 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
                 }
             });
 
-            data = indexData;
+            const newData: indexItem[] = [];
+
+            indexData.forEach((item) => {
+                const object = figma.getNodeById(item.id);
+                let targetType = settingData.target;
+
+                if (object !== null) {
+                    if (targetType === "frameinsection") {
+                        targetType = "FRAME";
+
+                        if (targetType === object.type && item.sectionName !== "") {
+                            newData.push(item);
+                        }
+                    } else {
+                        targetType = targetType.toUpperCase();
+
+                        if (targetType === object.type && item.sectionName === "") {
+                            newData.push(item);
+                        }
+                    }
+                }
+            });
+
+            data = newData;
         }
 
         setIndexData(data);
@@ -248,5 +258,5 @@ export function listDataArrange(list: any[], indexData: indexItem[], setWidgetSt
 }
 
 function getToday() {
-    return  dayjs().utc().format("YYYY.MM.DD HH:mm (UTC)");
+    return dayjs().utc().format("YYYY.MM.DD HH:mm (UTC)");
 }

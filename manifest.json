@@ -9,5 +9,9 @@
   ],
   "containsWidget": true,
   "widgetApi": "1.0.0",
-  "ui": "ui.html"
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
 }
