@@ -145,13 +145,14 @@ export function makeListStrucutre(option: SettingData, indexData: indexItem[], s
                     verticalAlignItems={"center"}
                     onClick={async (e) => {
                         const target = (await figma.getNodeByIdAsync(row.id)) as BaseNode;
+
                         let pageNode = target.parent as BaseNode;
 
                         if (pageNode.type == "SECTION") {
                             pageNode = pageNode.parent as PageNode;
                         }
 
-                        figma.currentPage = pageNode as PageNode;
+                        await figma.setCurrentPageAsync(pageNode as PageNode);
                         figma.viewport.scrollAndZoomIntoView([target]);
                     }}
                 >
