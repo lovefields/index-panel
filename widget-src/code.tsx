@@ -48,9 +48,9 @@ function indexWidget() {
                 tooltip: "Export CSV",
             },
         ],
-        ({ propertyName, propertyValue }) => {
+        async ({ propertyName, propertyValue }) => {
+            await setPageList(figma, settingData, setSettingData);
             if (propertyName === "setting") {
-                setPageList(figma, settingData, setSettingData);
                 return new Promise((resolve) => {
                     figma.showUI(__html__, { width: 840, height: 822 });
                     figma.ui.postMessage(settingData);
@@ -62,7 +62,7 @@ function indexWidget() {
             }
 
             if (propertyName === "creat") {
-                const thisWidgetNode = figma.getNodeById(widgetId) as WidgetNode;
+                const thisWidgetNode = (await figma.getNodeByIdAsync(widgetId)) as WidgetNode;
 
                 if (thisWidgetNode) {
                     let cloneWidget = thisWidgetNode.cloneWidget({
@@ -133,6 +133,8 @@ function indexWidget() {
     );
 
     useEffect(() => {
+        figma.loadAllPagesAsync();
+
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
                 setSettingData(msg.data);
@@ -181,9 +183,9 @@ function indexWidget() {
                     fill={"#464646"}
                     horizontalAlignItems={"center"}
                     verticalAlignItems={"center"}
-                    onClick={(e) => {
+                    onClick={async (e) => {
+                        await setPageList(figma, settingData, setSettingData);
                         return new Promise((resolve) => {
-                            setPageList(figma, settingData, setSettingData);
                             figma.showUI(__html__, { width: 840, height: 822 });
                             figma.ui.postMessage(settingData);
                         });
@@ -231,8 +233,8 @@ function indexWidget() {
                     horizontalAlignItems={"center"}
                     verticalAlignItems={"center"}
                     onClick={(e) => {
-                        return new Promise((resolve) => {
-                            setPageList(figma, settingData, setSettingData);
+                        return new Promise(async (resolve) => {
+                            await await setPageList(figma, settingData, setSettingData);
                             figma.showUI(__html__, { width: 840, height: 822 });
                             figma.ui.postMessage(settingData);
                         });

@@ -143,8 +143,8 @@ export function makeListStrucutre(option: SettingData, indexData: indexItem[], s
                     height={"fill-parent"}
                     horizontalAlignItems={"center"}
                     verticalAlignItems={"center"}
-                    onClick={(e) => {
-                        const target = figma.getNodeById(row.id) as BaseNode;
+                    onClick={async (e) => {
+                        const target = (await figma.getNodeByIdAsync(row.id)) as BaseNode;
                         let pageNode = target.parent as BaseNode;
 
                         if (pageNode.type == "SECTION") {

@@ -4,11 +4,11 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-export function setPageList(figma: PluginAPI, settingData: SettingData, setSettingData: Function) {
+export async function setPageList(figma: PluginAPI, settingData: SettingData, setSettingData: Function) {
     const pageList = figma.root.children;
     const pageData: PageItem[] = [];
 
-    pageList.forEach((page) => {
+    pageList.forEach((page, i) => {
         const listData = settingData.pageList.find((item) => item.id === page.id);
 
         if (listData === undefined) {
@@ -46,8 +46,8 @@ export function refresh(figma: PluginAPI, rowData: SettingData, indexData: index
     if (pageSelected.length > 0) {
         pageList = [];
 
-        pageSelected.forEach((data) => {
-            pageList.push(figma.getNodeById(data.id));
+        pageSelected.forEach((selectPage) => {
+            pageList.push(figma.root.children.find((page) => page.id === selectPage.id));
         });
     } else {
         pageList = figma.root.children;
@@ -122,6 +122,7 @@ export function refresh(figma: PluginAPI, rowData: SettingData, indexData: index
 }
 
 export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexItem[], setWidgetStatus: Function, setIndexData: Function, settingData: SettingData) {
+    console.log("list", list);
     if (list.length !== 0) {
         let data: indexItem[] = [];
 
@@ -227,7 +228,7 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
             const newData: indexItem[] = [];
 
             indexData.forEach((item) => {
-                const object = figma.getNodeById(item.id);
+                const object = figma.getNodeByIdAsync(item.id);
                 let targetType = settingData.target;
 
                 if (object !== null) {
