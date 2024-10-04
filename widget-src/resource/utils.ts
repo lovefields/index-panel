@@ -122,7 +122,6 @@ export function refresh(figma: PluginAPI, rowData: SettingData, indexData: index
 }
 
 export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexItem[], setWidgetStatus: Function, setIndexData: Function, settingData: SettingData) {
-    console.log("list", list);
     if (list.length !== 0) {
         let data: indexItem[] = [];
 
@@ -155,15 +154,12 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
                     otherEdit: true,
                 });
             });
+
+            setIndexData(data);
+            setWidgetStatus("have");
         } else {
             // arrange
-            indexData.forEach((row, count) => {
-                const haveItem = list.filter((item) => item.id === row.id);
-
-                if (haveItem.length === 0) {
-                    indexData.splice(count, 1);
-                }
-            });
+            const newIndexData: indexItem[] = indexData.filter((item) => list.find((row) => item.id === row.id));
 
             list.forEach((row) => {
                 let hasItem = false;
@@ -177,13 +173,16 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
                     other: "",
                     otherEdit: true,
                 };
-                let pageName;
+                let pageName = "";
 
-                indexData.forEach((item, i) => {
+                newIndexData.forEach((item, i) => {
                     if (row.id === item.id) {
                         hasItem = true;
                         count = i;
-                        data = item;
+                        data = {
+                            ...item,
+                            name: row.name,
+                        };
                     }
                 });
 
@@ -203,7 +202,7 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
 
                 // @ts-ignore : IDE가 인식못함
                 if (hasItem === true) {
-                    indexData[count] = {
+                    newIndexData[count] = {
                         id: data.id,
                         name: data.name,
                         sectionName: data.sectionName,
@@ -213,7 +212,7 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
                         otherEdit: data.otherEdit,
                     };
                 } else {
-                    indexData.push({
+                    newIndexData.push({
                         id: row.id,
                         name: row.name,
                         sectionName: row.sectionName,
@@ -226,33 +225,41 @@ export function listDataArrange(figma: PluginAPI, list: any[], indexData: indexI
             });
 
             const newData: indexItem[] = [];
+            const promiseList: Promise<boolean>[] = [];
 
-            indexData.forEach((item) => {
-                const object = figma.getNodeByIdAsync(item.id);
-                let targetType = settingData.target;
+            newIndexData.forEach(async (item) => {
+                promiseList.push(
+                    new Promise(async (resolv) => {
+                        const object = await figma.getNodeByIdAsync(item.id);
+                        let targetType = settingData.target;
 
-                if (object !== null) {
-                    if (targetType === "frameinsection") {
-                        targetType = "FRAME";
+                        if (object !== null) {
+                            if (targetType === "frameinsection") {
+                                targetType = "FRAME";
 
-                        if (targetType === object.type && item.sectionName !== "") {
-                            newData.push(item);
+                                if (targetType === object.type && item.sectionName !== "") {
+                                    newData.push(item);
+                                }
+                            } else {
+                                targetType = targetType.toUpperCase();
+
+                                if (targetType === object.type && item.sectionName === "") {
+                                    newData.push(item);
+                                }
+                            }
+
+                            resolv(true);
                         }
-                    } else {
-                        targetType = targetType.toUpperCase();
-
-                        if (targetType === object.type && item.sectionName === "") {
-                            newData.push(item);
-                        }
-                    }
-                }
+                    })
+                );
             });
 
-            data = newData;
+            Promise.all(promiseList).then(() => {
+                data = newData;
+                setIndexData(data);
+                setWidgetStatus("have");
+            });
         }
-
-        setIndexData(data);
-        setWidgetStatus("have");
     } else {
         setWidgetStatus("null");
     }

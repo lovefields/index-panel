@@ -37,11 +37,11 @@ function indexWidget() {
                 propertyName: "refresh",
                 tooltip: "Refresh",
             },
-            {
-                itemType: "action",
-                propertyName: "creat",
-                tooltip: "Creat new Index",
-            },
+            // {
+            //     itemType: "action",
+            //     propertyName: "creat",
+            //     tooltip: "Creat new Index",
+            // },
             {
                 itemType: "action",
                 propertyName: "csv",
@@ -61,32 +61,32 @@ function indexWidget() {
                 refresh(figma, settingData, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
             }
 
-            if (propertyName === "creat") {
-                const thisWidgetNode = (await figma.getNodeByIdAsync(widgetId)) as WidgetNode;
+            // if (propertyName === "creat") {
+            //     const thisWidgetNode = (await figma.getNodeByIdAsync(widgetId)) as WidgetNode;
 
-                if (thisWidgetNode) {
-                    let cloneWidget = thisWidgetNode.cloneWidget({
-                        widgetStatus: "new",
-                        settingData: {
-                            target: "frame",
-                            rule: "none",
-                            reg: "",
-                            other: false,
-                            pageName: false,
-                            sectionName: false,
-                            pageList: [],
-                        },
-                        indexData: {},
-                        indexTitle: "",
-                        indexCaption: "",
-                        updateData: "",
-                    });
+            //     if (thisWidgetNode) {
+            //         let cloneWidget = thisWidgetNode.cloneWidget({
+            //             widgetStatus: "new",
+            //             settingData: {
+            //                 target: "frame",
+            //                 rule: "none",
+            //                 reg: "",
+            //                 other: false,
+            //                 pageName: false,
+            //                 sectionName: false,
+            //                 pageList: [],
+            //             },
+            //             indexData: {},
+            //             indexTitle: "",
+            //             indexCaption: "",
+            //             updateData: "",
+            //         });
 
-                    cloneWidget.x += thisWidgetNode.width + 50;
-                } else {
-                    figma.notify("Something wrong");
-                }
-            }
+            //         cloneWidget.x += thisWidgetNode.width + 50;
+            //     } else {
+            //         figma.notify("Something wrong");
+            //     }
+            // }
 
             if (propertyName === "csv") {
                 let csvData = "data:text/csv;charset=utf-8,\uFEFF";
@@ -134,11 +134,11 @@ function indexWidget() {
 
     useEffect(() => {
         figma.loadAllPagesAsync();
-
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
                 setSettingData(msg.data);
                 refresh(figma, msg.data, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
+                figma.closePlugin();
             }
 
             if (msg.type !== "reg") {
