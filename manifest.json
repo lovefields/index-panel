@@ -11,6 +11,7 @@
   "widgetApi": "1.0.0",
   "ui": "ui.html",
   "documentAccess": "dynamic-page",
+  "permissions": ["payments"],
   "networkAccess": {
     "allowedDomains": ["none"]
   }

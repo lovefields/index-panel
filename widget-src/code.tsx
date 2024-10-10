@@ -22,94 +22,60 @@ function indexWidget() {
     const [updateData, setUpdateData] = useSyncedState<string>("updateData", "");
     const [pageName, setPageName] = useSyncedState<boolean>("pageName", false);
     const [sectionName, setSectionName] = useSyncedState<boolean>("sectionName", false);
-    let widgetId = useWidgetNodeId();
+    const [propertyMenu, setPropertyMenu] = useSyncedState<WidgetPropertyMenuItem[]>("propertyMenu", [
+        {
+            itemType: "action",
+            propertyName: "setting",
+            tooltip: "Setting",
+        },
+        {
+            itemType: "action",
+            propertyName: "refresh",
+            tooltip: "Refresh",
+        },
+        {
+            itemType: "action",
+            propertyName: "csv",
+            tooltip: "Export CSV",
+        },
+    ]);
     let structure;
 
-    usePropertyMenu(
-        [
-            {
-                itemType: "action",
-                propertyName: "setting",
-                tooltip: "Setting",
-            },
-            {
-                itemType: "action",
-                propertyName: "refresh",
-                tooltip: "Refresh",
-            },
-            // {
-            //     itemType: "action",
-            //     propertyName: "creat",
-            //     tooltip: "Creat new Index",
-            // },
-            {
-                itemType: "action",
-                propertyName: "csv",
-                tooltip: "Export CSV",
-            },
-        ],
-        async ({ propertyName, propertyValue }) => {
-            await setPageList(figma, settingData, setSettingData);
-            if (propertyName === "setting") {
-                return new Promise((resolve) => {
-                    figma.showUI(__html__, { width: 840, height: 822 });
-                    figma.ui.postMessage(settingData);
-                });
-            }
+    usePropertyMenu(propertyMenu, async ({ propertyName, propertyValue }) => {
+        await setPageList(figma, settingData, setSettingData);
+        if (propertyName === "setting") {
+            return new Promise((resolve) => {
+                figma.showUI(__html__, { width: 840, height: 822 });
+                figma.ui.postMessage(settingData);
+            });
+        }
 
-            if (propertyName === "refresh") {
-                refresh(figma, settingData, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
-            }
+        if (propertyName === "refresh") {
+            refresh(figma, settingData, indexData, setPageName, setSectionName, setUpdateData, setWidgetStatus, setIndexData, setSettingData);
+        }
 
-            // if (propertyName === "creat") {
-            //     const thisWidgetNode = (await figma.getNodeByIdAsync(widgetId)) as WidgetNode;
+        if (propertyName === "csv") {
+            let csvData = "data:text/csv;charset=utf-8,\uFEFF";
 
-            //     if (thisWidgetNode) {
-            //         let cloneWidget = thisWidgetNode.cloneWidget({
-            //             widgetStatus: "new",
-            //             settingData: {
-            //                 target: "frame",
-            //                 rule: "none",
-            //                 reg: "",
-            //                 other: false,
-            //                 pageName: false,
-            //                 sectionName: false,
-            //                 pageList: [],
-            //             },
-            //             indexData: {},
-            //             indexTitle: "",
-            //             indexCaption: "",
-            //             updateData: "",
-            //         });
+            csvData += "No,Frame Name,Status\r\n";
 
-            //         cloneWidget.x += thisWidgetNode.width + 50;
-            //     } else {
-            //         figma.notify("Something wrong");
-            //     }
-            // }
+            indexData.forEach((row, count) => {
+                const frameName = `${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`;
+                let statusName = "Not Started";
 
-            if (propertyName === "csv") {
-                let csvData = "data:text/csv;charset=utf-8,\uFEFF";
+                if (row.status === 1) {
+                    statusName = "In progress";
+                }
 
-                csvData += "No,Frame Name,Status\r\n";
+                if (row.status === 2) {
+                    statusName = "Completed";
+                }
 
-                indexData.forEach((row, count) => {
-                    const frameName = `${pageName ? `${row.pageName} - ` : ""} ${sectionName ? `[${row.sectionName}] ` : ""}${row.name}`;
-                    let statusName = "Not Started";
+                csvData += `${count + 1},${frameName},${statusName}\r\n`;
+            });
 
-                    if (row.status === 1) {
-                        statusName = "In progress";
-                    }
-
-                    if (row.status === 2) {
-                        statusName = "Completed";
-                    }
-
-                    csvData += `${count + 1},${frameName},${statusName}\r\n`;
-                });
-
-                return new Promise((resolve) => {
-                    figma.showUI(`
+            return new Promise((resolve) => {
+                figma.showUI(`
                         <script>
                             window.onmessage = (event) => {
                                 const data = event.data.pluginMessage;
@@ -123,16 +89,41 @@ function indexWidget() {
                             };
                         </script>
                     `);
-                    figma.ui.postMessage({
-                        title: indexTitle ? indexTitle : "Index Panel",
-                        content: csvData,
-                    });
+                figma.ui.postMessage({
+                    title: indexTitle ? indexTitle : "Index Panel",
+                    content: csvData,
                 });
-            }
+            });
         }
-    );
+
+        if (propertyName === "donate") {
+            await figma.payments?.initiateCheckoutAsync({ interstitial: "SKIP" }).then(() => {
+                figma.notify("Thank You So Much!");
+            });
+        }
+    });
 
     useEffect(() => {
+        figma.payments?.setPaymentStatusInDevelopment({ type: "UNPAID" });
+
+        if (figma.payments?.status.type === "UNPAID" && propertyMenu.length === 3) {
+            setPropertyMenu([
+                ...propertyMenu,
+                {
+                    itemType: "separator",
+                },
+                {
+                    itemType: "action",
+                    propertyName: "donate",
+                    tooltip: "Donate",
+                },
+            ]);
+        }
+
+        if (figma.payments?.status.type === "PAID" && propertyMenu.length !== 3) {
+            setPropertyMenu(propertyMenu.slice(0, 3));
+        }
+
         figma.loadAllPagesAsync();
         figma.ui.onmessage = (msg) => {
             if (msg.type === "setting") {
