@@ -39,6 +39,7 @@ function indexWidget() {
             tooltip: "Export CSV",
         },
     ]);
+    const [hasLimited, setHasLimited] = useSyncedState<boolean>("hasLimited", true);
     let structure;
 
     usePropertyMenu(propertyMenu, async ({ propertyName, propertyValue }) => {
@@ -96,7 +97,7 @@ function indexWidget() {
             });
         }
 
-        if (propertyName === "donate") {
+        if (propertyName === "purchases") {
             await figma.payments?.initiateCheckoutAsync({ interstitial: "SKIP" }).then(() => {
                 figma.notify("Thank You So Much!");
             });
@@ -104,8 +105,6 @@ function indexWidget() {
     });
 
     useEffect(() => {
-        figma.payments?.setPaymentStatusInDevelopment({ type: "UNPAID" });
-
         if (figma.payments?.status.type === "UNPAID" && propertyMenu.length === 3) {
             setPropertyMenu([
                 ...propertyMenu,
@@ -114,14 +113,16 @@ function indexWidget() {
                 },
                 {
                     itemType: "action",
-                    propertyName: "donate",
-                    tooltip: "Donate",
+                    propertyName: "purchases",
+                    tooltip: "Purchases",
                 },
             ]);
+            setHasLimited(true);
         }
 
         if (figma.payments?.status.type === "PAID" && propertyMenu.length !== 3) {
             setPropertyMenu(propertyMenu.slice(0, 3));
+            setHasLimited(false);
         }
 
         figma.loadAllPagesAsync();
@@ -310,7 +311,7 @@ function indexWidget() {
                         </Text>
                     </AutoLayout>
 
-                    {makeListStrucutre(settingData, indexData, setIndexData, pageName, sectionName)}
+                    {makeListStrucutre(settingData, indexData, setIndexData, pageName, sectionName, hasLimited)}
                 </AutoLayout>
             </AutoLayout>
         );

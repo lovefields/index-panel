@@ -46,7 +46,7 @@ export function ruleText(option: SettingData) {
 }
 
 // list structure maker
-export function makeListStrucutre(option: SettingData, indexData: indexItem[], setIndexData: Function, pageName: boolean, sectionName: boolean) {
+export function makeListStrucutre(option: SettingData, indexData: indexItem[], setIndexData: Function, pageName: boolean, sectionName: boolean, hasLimited: boolean) {
     const arrowRight = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.64557 3.89733C6.84034 3.70158 7.15693 3.70079 7.35267 3.89557L11.6677 8.18916C11.762 8.283 11.815 8.41055 11.815 8.54359C11.815 8.67663 11.762 8.80418 11.6677 8.89802L7.35267 13.1916C7.15693 13.3864 6.84034 13.3856 6.64557 13.1899C6.45079 12.9941 6.45158 12.6775 6.64733 12.4828L10.6061 8.54359L6.64733 4.60443C6.45158 4.40966 6.45079 4.09307 6.64557 3.89733Z" fill="#333"/></svg>`;
     const pencli = `<svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.5558 4.51626C13.6399 4.43208 13.7746 4.43208 13.8587 4.51626L14.9933 5.65082L14.9986 5.6561C15.0812 5.73663 15.0893 5.86982 14.998 5.96532L13.9787 6.98457L12.5331 5.53893L13.5558 4.51626ZM14.6984 3.67657C14.1505 3.12864 13.264 3.12864 12.7161 3.67657L11.2736 5.11908C11.2538 5.13888 11.2357 5.15972 11.2192 5.18144L3.93976 12.453C3.82827 12.5643 3.76562 12.7155 3.76562 12.873V15.1584C3.76562 15.4863 4.03146 15.7521 4.35938 15.7521H6.6447C6.80218 15.7521 6.9532 15.6896 7.06455 15.5782L14.4878 8.15496C14.4899 8.15292 14.4919 8.15087 14.4939 8.14881L15.8411 6.8016L15.8464 6.79625C16.3843 6.24455 16.3928 5.36005 15.8307 4.80881L14.6984 3.67657ZM13.1391 7.8243L11.6972 6.38244L4.95312 13.1192V14.5646H6.39876L13.1391 7.8243Z" fill="#6436EA"/></svg>`;
     let listStructure: any[] = [];
@@ -191,6 +191,15 @@ export function makeListStrucutre(option: SettingData, indexData: indexItem[], s
 
         listStructure.push(structure);
     });
+
+    if (hasLimited === true) {
+        listStructure = listStructure.splice(0, 10);
+        listStructure.push(
+            <AutoLayout name="notify" width={"fill-parent"} padding={{ vertical: 10, horizontal: 0 }} horizontalAlignItems="center" stroke={"#e0e0e0"} fill="#fff3f3" strokeWidth={1} strokeAlign={"center"} strokeDashPattern={[2, 2]}>
+                <Text fill="#e84e4e">Free user has only can make 10 rows.</Text>
+            </AutoLayout>
+        );
+    }
 
     return (
         <AutoLayout name="list-wrap" width={"fill-parent"} stroke={"#f1f1f1"} strokeWidth={1} cornerRadius={10} direction={"vertical"}>
